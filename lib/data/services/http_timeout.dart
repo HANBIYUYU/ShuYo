@@ -7,7 +7,13 @@ class HttpTimeout {
   static const probe = Duration(seconds: 3);
 
   /// DNS, TCP, and TLS connection establishment.
-  static const connect = Duration(seconds: 5);
+  ///
+  /// Campus services occasionally drop the first SYN, so a handshake that
+  /// normally finishes in well under a second can need a retransmit or two.
+  /// Five seconds aborted the request as soon as one retransmit happened,
+  /// which surfaced as a bogus "login did not finish" failure on mobile links
+  /// and on emulators.
+  static const connect = Duration(seconds: 12);
 
   /// A complete ordinary API request, including its response body.
   static const normal = Duration(seconds: 10);

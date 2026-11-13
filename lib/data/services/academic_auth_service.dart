@@ -163,8 +163,10 @@ class AcademicAuthService {
         .map((cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
     if (header.isEmpty) return WebVpnSessionStatus.loginRequired;
+    // The validator walks up to ten hops, so one slow hop must not be enough
+    // to invalidate an otherwise healthy session.
     return _directSessionValidator(header).timeout(
-      HttpTimeout.normal,
+      HttpTimeout.composed,
       onTimeout: () => WebVpnSessionStatus.unavailable,
     );
   }

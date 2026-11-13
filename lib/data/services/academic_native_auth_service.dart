@@ -293,7 +293,9 @@ class AcademicNativeAuthService {
   Future<void> sendCode(AcademicVerificationMethod method) {
     return _runAuthenticationStage(
       'send-code',
-      HttpTimeout.normal,
+      // Must stay above [HttpTimeout.connect]: a single retransmitted
+      // handshake used to abort this stage before the request could finish.
+      HttpTimeout.authentication,
       () => _sendCode(method),
     );
   }
@@ -315,7 +317,8 @@ class AcademicNativeAuthService {
   }) {
     return _runAuthenticationStage(
       'verify-code',
-      HttpTimeout.normal,
+      // See [sendCode]: the stage budget has to cover one slow handshake.
+      HttpTimeout.authentication,
       () => _verifyCode(method: method, code: code),
     );
   }
